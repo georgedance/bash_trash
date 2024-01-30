@@ -13,7 +13,7 @@ fi
 
 
 
-function trash-init() {
+function trash_init() {
 
     if [ ! -d $TRASHDIR ]; then
         mkdir -pv $TRASHDIR
@@ -28,32 +28,21 @@ function trash-init() {
 }
 
 # when this file is sourced, it should run this function automatically
-trash-init
+trash_init
 
 
 
 # main trash functions
 
-function trash-list() {
+function trash() {
 
-    # returns 1 if there aren't any files in $TRASHDIR
+    # passes the parameters onto trash_put. you may want to alias rm to trash.
 
-    FILELIST=$(ls "$TRASHDIR"/files | xargs)
-
-    if [ "$FILELIST" ]; then
-        printf "%s\t%s\t%s\n" "Filename" "Deleted On" "File Path"
-        for file in $FILELIST
-        do
-            _trash_infofile_validate "$file" && printf "%s\t%s\t%s\n" "$file" \
-                "`date -d$TRASH_DATE +'%a, %_d %b %I:%M %p'`" "$TRASH_PATH"
-        done
-    else
-        return 1
-    fi
+    trash_put "$@"
 
 }
 
-function trash-put() {
+function trash_put() {
 
     # this should essentially replace your "rm".
 
@@ -65,7 +54,6 @@ function trash-put() {
         #  - append "underscore number" to filename, where number is 1 greater than whatever's already there
 
         # test if the file exists
-        # TODO: 
         if [ ! -e $file ]; then
             echo file \'$file\' doesn\'t exist!
             continue
@@ -107,25 +95,45 @@ EOF
 
 }
 
-function trash() {
+function trash_list() {
 
-    # passes the parameters onto trash-put. you may want to alias rm to trash.
+    # returns 1 if there aren't any files in $TRASHDIR
 
-    trash-put "$@"
+    FILELIST=$(ls "$TRASHDIR"/files | xargs)
+
+    if [ "$FILELIST" ]; then
+        printf "%s\t%s\t%s\n" "Filename" "Deleted On" "File Path"
+        for file in $FILELIST
+        do
+            _trash_infofile_validate "$file" && printf "%s\t%s\t%s\n" "$file" \
+                "`date -d$TRASH_DATE +'%a, %_d %b %I:%M %p'`" "$TRASH_PATH"
+        done
+    else
+        return 1
+    fi
 
 }
 
 # TODO: implement this function
-function trash-restore() {
+function trash_restore() {
 
     echo unimplemented
 
 }
 
-# FIXME: redo this whole function
-function trash-empty() {
+# TODO: implement this function
+function trash_rm() {
 
-    # this behaviour tried to emulate trash-cli's trash-empty. it works alright though.
+    # find matching files and prompt to remove if there is multiple files
+
+    echo unimplemented
+
+}
+
+# TODO: redo this whole function
+function trash_empty() {
+
+    # this behaviour tried to emulate trash-cli's trash_empty. it works alright though.
 
     echo "Would empty the following trash directories:"
 
@@ -144,7 +152,7 @@ function trash-empty() {
                 # check if there are actually files to delete
                 for file in "$(ls $dir/files/)"
                 do
-                    # danger
+                    # danger (highway to it)
                     $(which rm) -vi "$dir/files/$file"
                 done
             done
@@ -153,15 +161,6 @@ function trash-empty() {
             echo "cancelled"
             ;;
     esac
-
-}
-
-# TODO: implement this function
-function trash-rm() {
-
-    # find matching files and prompt to remove if there is multiple files
-
-    echo unimplemented
 
 }
 
