@@ -102,10 +102,10 @@ function trash_list() {
     FILELIST=$(ls "$TRASHDIR"/files | xargs)
 
     if [ "$FILELIST" ]; then
-        printf "%s\t%s\t%s\n" "Filename" "Deleted On" "File Path"
+        printf "%s\t\t%s\n" "Deleted On" "File Path"
         for file in $FILELIST
         do
-            _trash_infofile_validate "$file" && printf "%s\t%s\t%s\n" "$file" \
+            _trash_infofile_validate "$file" && printf "%s\t%s\n" \
                 "`date -d$TRASH_DATE +'%a, %_d %b %I:%M %p'`" "$TRASH_PATH"
         done
     else
